@@ -13,6 +13,9 @@ class Headers : System.Collections.Generic.List[PSObject]{
             .SYNOPSIS
             Returns the *FIRST* header matching $name
         #>
+
+        Write-Debug("Headers.getHeaderByName()")
+
         foreach($header in $this){
             if($header.getName() -eq $name){
                 return $header
@@ -25,10 +28,12 @@ class Headers : System.Collections.Generic.List[PSObject]{
     [PSObject]getHeadersByName([string]$name){
         <#
             .SYNOPSIS
-            Returns an array of all headers matching a name
+            Returns a List object of all headers matching a name
         #>
 
-        $rtnArray = New-Object System.Collections.Generic.List[PSObject]
+        Write-Debug("Headers.getHeadersByName()")
+
+        $rtnArray = [System.Collections.Generic.List[PSObject]]::new()
 
         foreach($header in $this){
             if($header.getName() -eq $name){
@@ -37,6 +42,31 @@ class Headers : System.Collections.Generic.List[PSObject]{
         }
         
         return $rtnArray
+    }
+
+
+    [Headers]parseHeaders([string]$rawHeaders){
+        <#
+        .SYNOPSIS
+        Parse for headers
+        #>
+
+        Write-Debug("Headers.parseHeaders()")
+
+        $search = '^(?<Name>[^:]+):(?<Body>.*)$'
+        $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
+
+        $matches = $regex.Matches($rawHeaders)
+        Write-Debug("Headers found: $($matches.Count)")
+
+        foreach ($match in $matches){
+            $name = $match.Groups["Name"].Value
+            $body = $match.Groups["Body"].Value
+            $hf = [HeaderFieldFactory]::CreateHeaderField($name, $body)
+            $this.Add($hf)
+        }
+
+        return $this
     }
 
 

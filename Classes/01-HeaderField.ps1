@@ -24,43 +24,108 @@ class HeaderField{
 
 
     # Class variables
-    hidden [String]$_name
-    hidden [String]$_body
+    [string]$Name
+    [string]$Body
 
 
     #
     # Class Constructors
     #
-    HeaderField(){
+    HeaderField([string]$name, [string]$body){
+        $this.Name = $name
+        $this.Body = $body
     }
 
 
     #
     # Getters/Setters
     #
-    [HeaderField]setName([String]$name){
-        $this._name = $name
+    [HeaderField]setName([string]$name){
+        #Write-Debug("HeaderField.setName()")
+        $this.Name = $name
         return $this
     }
-    [String]getName(){
-        return $this._name
+    [string]getName(){
+        #Write-Debug("HeaderField.getName()")
+        return $this.Name
     }
 
 
-    [HeaderField]setBody([String]$body){
-        $this._body = $body
+    [HeaderField]setBody([string]$body){
+
+        #Write-Debug("HeaderField.setBody()")
+
+        # Trim begining whitespace
+        $search = '^\s+'
+        $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
+        $trimmed = $regex.Replace($body, '')
+
+        $this.Body = $trimmed
         return $this
     }
-    [String]getBody(){
-        return $this._body
+    [string]getBody(){
+        <#
+        .SYNOPSIS
+        Return the header field body, striping excess whitespace
+
+        .DESCRIPTION
+        Since you *probably* don't care about whitespace, we will strip
+        excessive whitespace before returning the header data
+        #>
+
+        #Write-Debug("HeaderField.getBody()")
+
+        $str = $this.Body
+        $search = '\s{2,}'
+
+        $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
+
+        $str = $regex.Replace($str, '')
+
+        return $str
+    }
+    [string]getBodyRaw(){
+        <#
+        .SYNOPSIS
+        Return the raw data of a header field body
+
+        .DESCRIPTION
+        This is usefull if you need to see the extra whitespace a header field
+        may contain for some reason. You probably don't, but I'm not seeing
+        anything obvious in RFC5322 precluding the possiblility
+        #>
+
+        #Write-Debug("HeaderField.getBodyRaw()")
+
+        return $this.Body
+    }
+
+
+    #
+    # "Abstract" methods
+    #
+    [void]ParseBody() {
+        # Default behavior for generic headers
+    }
+
+    static [Array]fieldNames(){
+        <#
+        .SYNOPSIS
+        Return an array of field names a given plugin can handle
+
+        .NOTES
+        Abstract method - implement in child!
+        #>
+        throw System.NotImplementedException::New('Abstract method not implemented in child class')
     }
 
 
     #
     # Magic Methods
     #
-    [String]toString(){
-        $rtn = $this._name + ": " + $this._body
+    [string]ToString(){
+        #Write-Debug("HeaderField.ToString()")
+        $rtn = $this.getName() + ": " + $this.getBody()
         return $rtn
     }
 

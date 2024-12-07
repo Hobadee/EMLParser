@@ -9,22 +9,22 @@ class Imf{
 
     # Class variables
     # I can't remember - does declaring them here make them global to all instances, or is that Python?!
-    hidden [String]$_RawImf
-    hidden [Headers]$_Headers
+    [string]$RawImf
+    [Headers]$Headers
 
 
     #
     # Class Constructors
     #
     Imf(){
-        $this._Headers = [Headers]::new()
+        $this.Headers = [Headers]::new()
     }
 
 
     #
     # Getters/Setters
     #
-    [Imf]setRawData([String]$data){
+    [Imf]setRawData([string]$data){
         <#
         .SYNOPSIS
         Set raw IMF data
@@ -34,11 +34,38 @@ class Imf{
         ie: `Get-Content -Raw test.eml`
         Failure to pass raw data will cause parsing errors down the line!
         #>
-        $this._RawImf = $data
+
+        Write-Debug("Imf.setRawData()")
+
+        $this.RawImf = $data
+
+        $this.Headers.parseHeaders($data)
+
         return $this
     }
-    [String]getRawData(){
-        return $this._RawImf
+    [string]getRawData(){
+
+        Write-Debug("Imf.getRawData()")
+
+        return $this.RawImf
+    }
+
+
+    [Imf]setHeaders([Headers]$headers){
+
+        Write-Debug("Imf.setHeaders()")
+
+        if($null -ne $this.Headers){
+           throw System.System.AccessViolationException::New('Headers already set - cannot overwrite!')
+        }
+        $this.Headers = $headers
+        return $this
+    }
+    [Headers]getHeaders(){
+
+        #Write-Debug("Imf.getHeaders()")
+
+        return $this.Headers
     }
 
 
@@ -57,6 +84,8 @@ class Imf{
             We should probably trim all extra whitespace to a single space character as well
         #>
 
+        Write-Debug("Imf.unfold()")
+
         # Unfold by "s/\r\n\s+/ /"
         # https://stackoverflow.com/questions/53867147/grep-and-sed-equivalent-in-powershell
         # ^ ??
@@ -66,20 +95,24 @@ class Imf{
         # We need to replace with a single space so we don't concatenate the data
         $replace = ' '
 
-        $this._RawImf = $this._RawImf -replace $search, $replace
+        $this.RawImf = $this.RawImf -replace $search, $replace
 
         return $this
     }
 
 
-    [Imf]fold([String]$imf){
+    [Imf]fold([string]$imf){
         <#
             .SYNOPSIS
             Function to fold header fields
 
             .DESCRIPTION
             RFC 5322 - 2.2.3 - https://datatracker.ietf.org/doc/html/rfc5322#section-2.2.3
+
+            Does fancy magic to ensure nothing over 80 characters per line.  Except when there should be.
         #>
+
+        Write-Debug("Imf.fold()")
 
         # This isn't terribly important for our purposes right now.  Implement later, if ever.
         throw System.NotImplementedException::New('"Fold" Method not implemented')
@@ -89,31 +122,49 @@ class Imf{
     }
 
 
-    [Imf]parseHeaders(){
+    # [Imf]parseHeaders(){
+    #     <#
+    #     .SYNOPSIS
+    #     Parse $self._RawImf for headers
+    #     #>
+
+    #     Write-Debug("Imf.parseHeaders()")
+
+    #     $search = '^(?<Name>[^:]+):(?<Body>.*)$'
+    #     $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
+
+    #     $matches = $regex.Matches($this.RawImf)
+    #     Write-Debug("Headers found: $($matches.Count)")
+
+    #     foreach ($match in $matches){
+    #         $name = $match.Groups["Name"].Value
+    #         $body = $match.Groups["Body"].Value
+    #         $hf = [HeaderField]::new()
+    #         $hf.setName($name).setBody($body)
+    #         $this.getHeaders().Add($hf)
+    #     }
+
+    #     return $this
+    # }
+
+
+    [PSObject]getPath(){
         <#
         .SYNOPSIS
-        Parse $self._RawImf for headers
+        Gets the path the message took.  Uses `Received` headers
+
+        .NOTES
+        TODO:   Order path properly
+                    We can't sort by timestamps since we don't have microseconds
+                Do we need to include X-Recieved?
         #>
 
-        Write-Debug("Parsing headers")
+        Write-Debug("Imf.getPath()")
 
-        #$search = '^([^:]+):(.*)$'
-        $search = '^(?<Name>[^:]+):(?<Body>.*)$'
-        #$search = '(?<Name>[^:]+):(?<Body>.*)'
-        $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
+        $path = $this.getHeaders().getHeadersByName("Received")
+        
+        return $path
 
-        $matches = $regex.Matches($this._RawImf)
-        Write-Debug("Headers found: $($matches.Count)")
-
-        foreach ($match in $matches){
-            $name = $match.Groups["Name"].Value
-            $body = $match.Groups["Body"].Value
-            $hf = [HeaderField]::new()
-            $hf.setName($name).setBody($body)
-            $this._Headers.Add($hf)
-        }
-
-        return $this
     }
 
 }
