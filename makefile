@@ -56,7 +56,7 @@ build-module:
 	$(CMD_PWSH) -c 'Build-Module'
 
 doShell:
-	$(CMD_PWSH) -noe -c 'Import-Module ./$(ODIR)/$(ONAME).psd1'
+	$(CMD_PWSH) -noe -c 'try {Import-Module ./$(ODIR)/$(ONAME).psd1 -ErrorAction Stop} catch {$$Error[0] | Select-Object *}'
 
 doTest:
 	$(CMD_PWSH) -c 'Import-Module ./$(ODIR)/$(ONAME).psd1;Invoke-Pester;exit'
