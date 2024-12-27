@@ -1,3 +1,12 @@
+<#
+TODO: Plugins - Make a singleton to track plugin registration
+                `New-Object -TypeName <class-name>`
+
+#>
+
+
+
+
 class ReceivedHeaderField : HeaderField {
     [string]$Timestamp
     [string]$Server
@@ -27,8 +36,8 @@ class ReceivedHeaderField : HeaderField {
 }
 
 class FromHeaderField : HeaderField {
-    [string]$EmailAddress
-    [string]$DisplayName
+    [string]$Name
+    [Email]$Email
 
     FromHeaderField([string]$name, [string]$body) : base($name, $body){
         <#
@@ -37,10 +46,18 @@ class FromHeaderField : HeaderField {
         #>
     }
 
+
     [void]ParseBody() {
-        # Extract email and display name from $this.Body
-        $this.EmailAddress = "Parsed Email"
-        $this.DisplayName = "Parsed Name"
+
+        $search = '(?:(?<Name>.+)\s+)?<(?<Username>.+)@(?<Domain>.+)>'
+        $regex = [regex]::new($search)
+
+        $match = $regex.Matches($this.Body)
+
+        $this.Name = $match[0].Groups["Name"].Value
+        $Username = $match[0].Groups["Username"].Value
+        $Domain = $match[0].Groups["Domain"].Value
+        $this.Email = [Email]::new($Username, $Domain)
     }
 
 
