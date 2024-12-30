@@ -8,15 +8,4 @@ class PluginHeaderReceived : IPluginHeader {
     }
 }
 
-$pluginManager = [HeaderFieldPlugins]::GetInstance()
-$pluginManager.RegisterPlugin([PluginHeaderReceived])
-
-
-<#
-$plugin = $pluginManager.GetPluginForField("Received")
-if ($plugin -ne $null) {
-    $plugin.ParseBody()
-} else {
-    Write-Host "No plugin found for the header field."
-}
-#>
+[HeaderFieldPlugins]::GetInstance().RegisterPlugin([PluginHeaderReceived])

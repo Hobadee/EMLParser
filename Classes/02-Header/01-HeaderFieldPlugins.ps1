@@ -30,8 +30,9 @@ class HeaderFieldPlugins {
 
      [void]RegisterPlugin([Type] $pluginType) {
         # Ensure the type implements IPluginHeader
-        if (-not ($pluginType -is [IPluginHeader])) {
-            throw [ArgumentException]::New("The provided type does not implement IPluginHeader.")
+        $plugin = [Activator]::CreateInstance($pluginType)
+        if (-not ($plugin -is [IPluginHeader])) {
+                throw [ArgumentException]::New("The provided type does not implement IPluginHeader.")
         }
 
         # Add each field name to the registry, mapping it to the plugin type
@@ -42,7 +43,7 @@ class HeaderFieldPlugins {
 
     [IPluginHeader] GetPluginForField([string] $headerField) {
         if ($this.PluginRegistry.ContainsKey($headerField)) {
-            # Instantiate and return the appropriate plugin
+            # Instantiate and return the appropriate plugintes
             $pluginType = $this.PluginRegistry[$headerField]
             return [Activator]::CreateInstance($pluginType)
         }

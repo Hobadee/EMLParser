@@ -1,5 +1,7 @@
 class PluginHeaderFrom : IPluginHeader {
-    #
+
+
+    
     [void]ParseBody() {
         <#
         .SYNOPSIS
@@ -31,3 +33,5 @@ class PluginHeaderFrom : IPluginHeader {
     }
 
 }
+
+[HeaderFieldPlugins]::GetInstance().RegisterPlugin([PluginHeaderFrom])
