@@ -1,12 +1,18 @@
-class PluginHeaderFrom : IPluginHeader {
+class PluginHeaderFrom : PluginHeader {
+
+    [string]$Name
+    [Email]$Email
 
 
-    
     [void]ParseBody() {
         <#
         .SYNOPSIS
         Parse the header field as needed for the plugin
+
+        .DESCRIPTION
+        This plugin will parse the 'From' header field and extract the name and email address.
         #>
+        Write-Debug "Parsing 'From' header field"
 
         $search = '(?:(?<Name>.+)\s+)?<(?<Username>.+)@(?<Domain>.+)>'
         $regex = [regex]::new($search)

@@ -5,7 +5,7 @@ class HeaderFieldPlugins {
     #>
 
     static [HeaderFieldPlugins] $Instance = $null  # Explicitly initialize to $null
-    static [System.Collections.Generic.List[IPluginHeader]] $Plugins = $null
+    static [System.Collections.Generic.List[PluginHeader]] $Plugins = $null
     [System.Collections.Generic.Dictionary[string, [Type]]] $PluginRegistry
 
     static [HeaderFieldPlugins] GetInstance() {
@@ -16,12 +16,12 @@ class HeaderFieldPlugins {
     }
 
     HeaderFieldPlugins() {
-        #$this.Plugins = [System.Collections.Generic.List[IPluginHeader]]::new()
+        #$this.Plugins = [System.Collections.Generic.List[PluginHeader]]::new()
         $this.PluginRegistry = [System.Collections.Generic.Dictionary[string, [Type]]]::new()
     }
 
     <#
-    static [void]register([IPluginHeader]$plugin){
+    static [void]register([PluginHeader]$plugin){
         $inst = [HeaderFieldPlugins]::GetInstance()
         $inst.Plugins.Add($plugin)
         #[HeaderFieldPlugins]::Plugins.Add($plugin)
@@ -29,10 +29,10 @@ class HeaderFieldPlugins {
     #>
 
      [void]RegisterPlugin([Type] $pluginType) {
-        # Ensure the type implements IPluginHeader
+        # Ensure the type implements PluginHeader
         $plugin = [Activator]::CreateInstance($pluginType)
-        if (-not ($plugin -is [IPluginHeader])) {
-                throw [ArgumentException]::New("The provided type does not implement IPluginHeader.")
+        if (-not ($plugin -is [PluginHeader])) {
+                throw [ArgumentException]::New("The provided type does not implement PluginHeader.")
         }
 
         # Add each field name to the registry, mapping it to the plugin type
@@ -41,10 +41,11 @@ class HeaderFieldPlugins {
         }
     }
 
-    [IPluginHeader] GetPluginForField([string] $headerField) {
+    [PluginHeader] GetPluginForField([string] $headerField) {
         if ($this.PluginRegistry.ContainsKey($headerField)) {
             # Instantiate and return the appropriate plugintes
             $pluginType = $this.PluginRegistry[$headerField]
+            Write-Debug "Found plugin for field '$headerField': $pluginType"
             return [Activator]::CreateInstance($pluginType)
         }
         return $null  # No matching plugin found

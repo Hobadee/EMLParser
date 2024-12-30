@@ -7,19 +7,7 @@ class HeaderField{
     Used by the Header class to hold a single header field
 
     .NOTES
-    We need a way of having multiple different Header Field types
-    to handle things like routing headers, to/cc/bcc, etc...
-
-    Maybe needs to be a strategy pattern?  This locks us into an interface though
-    which we may not want - we may need to have flexible methods per type
-    Is there a pattern that supports this?
-
-    Possible patterns to look into:
-    - Strategy
-    - Template Method
-    - Decorator (Probably not - used for multiple concurrent states of a single item)
-    - State (Probably not - we aren't changing state of a single object)
-
+    Plugins implement this via the PluginHeader class
     #>
 
 
@@ -31,9 +19,29 @@ class HeaderField{
     #
     # Class Constructors
     #
+    HeaderField(){
+        <#
+        .SYNOPSIS
+        Class constructor for the HeaderField class
+        #>
+        $this.Name = $null
+        $this.Body = $null
+    }
     HeaderField([string]$name, [string]$body){
+        <#
+        .SYNOPSIS
+        Class constructor for the HeaderField class
+
+        .PARAMETER name
+        The name of the header field
+
+        .PARAMETER body
+        The body of the header field
+        #>
         $this.Name = $name
         $this.Body = $body
+        
+        $this.ParseBody()
     }
 
 
@@ -41,19 +49,36 @@ class HeaderField{
     # Getters/Setters
     #
     [HeaderField]setName([string]$name){
-        #Write-Debug("HeaderField.setName()")
+        <#
+        .SYNOPSIS
+        Set the name of the header field
+
+        .PARAMETER name
+        The name of the header field
+
+        .OUTPUTS
+        The current object
+        #>
         $this.Name = $name
         return $this
     }
     [string]getName(){
-        #Write-Debug("HeaderField.getName()")
+        <#
+        .SYNOPSIS
+        Get the name of the header field
+
+        .RETURN
+        The name of the header field
+        #>
         return $this.Name
     }
 
 
     [HeaderField]setBody([string]$body){
-
-        #Write-Debug("HeaderField.setBody()")
+        <#
+        .SYNOPSIS
+        Set the body of the header field
+        #>
 
         # Trim begining whitespace
         $search = '^\s+'
@@ -71,9 +96,10 @@ class HeaderField{
         .DESCRIPTION
         Since you *probably* don't care about whitespace, we will strip
         excessive whitespace before returning the header data
+        
+        .OUTPUTS
+        The body of the header field with excess whitespace removed
         #>
-
-        #Write-Debug("HeaderField.getBody()")
 
         $str = $this.Body
         $search = '\s{2,}'
@@ -93,9 +119,10 @@ class HeaderField{
         This is usefull if you need to see the extra whitespace a header field
         may contain for some reason. You probably don't, but I'm not seeing
         anything obvious in RFC5322 precluding the possiblility
-        #>
 
-        #Write-Debug("HeaderField.getBodyRaw()")
+        .OUTPUTS
+        The raw body of the header field
+        #>
 
         return $this.Body
     }
@@ -108,23 +135,15 @@ class HeaderField{
         # Default behavior for generic headers
     }
 
-    static [Array]fieldNames(){
-        <#
-        .SYNOPSIS
-        Return an array of field names a given plugin can handle
-
-        .NOTES
-        Abstract method - implement in child!
-        #>
-        throw System.NotImplementedException::New('Abstract method not implemented in child class')
-    }
-
 
     #
     # Magic Methods
     #
     [string]ToString(){
-        #Write-Debug("HeaderField.ToString()")
+        <#
+        .SYNOPSIS
+        Returns a string representation of the header field in the format "Name: Body"
+        #>
         $rtn = $this.getName() + ": " + $this.getBody()
         return $rtn
     }

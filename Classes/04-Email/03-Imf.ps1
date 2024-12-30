@@ -35,9 +35,8 @@ class Imf{
         Failure to pass raw data will cause parsing errors down the line!
         #>
 
-        Write-Debug("Imf.setRawData()")
-
         $this.RawImf = $data
+        $this.unfold()
 
         $this.Headers.parseHeaders($data)
 
@@ -52,9 +51,6 @@ class Imf{
 
 
     [Imf]setHeaders([Headers]$headers){
-
-        Write-Debug("Imf.setHeaders()")
-
         if($null -ne $this.Headers){
            throw System.System.AccessViolationException::New('Headers already set - cannot overwrite!')
         }

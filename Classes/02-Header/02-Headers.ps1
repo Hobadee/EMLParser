@@ -8,13 +8,11 @@ class Headers : System.Collections.Generic.List[PSObject]{
     #>
 
 
-    [HeaderField]getHeaderByName([string]$name){
+    [PluginHeader]getHeaderByName([string]$name){
         <#
             .SYNOPSIS
             Returns the *FIRST* header matching $name
         #>
-
-        Write-Debug("Headers.getHeaderByName()")
 
         foreach($header in $this){
             if($header.getName() -eq $name){
@@ -30,8 +28,6 @@ class Headers : System.Collections.Generic.List[PSObject]{
             .SYNOPSIS
             Returns a List object of all headers matching a name
         #>
-
-        Write-Debug("Headers.getHeadersByName()")
 
         $rtnArray = [System.Collections.Generic.List[PSObject]]::new()
 
@@ -50,8 +46,6 @@ class Headers : System.Collections.Generic.List[PSObject]{
         .SYNOPSIS
         Parse for headers
         #>
-
-        Write-Debug("Headers.parseHeaders()")
 
         $search = '^(?<Name>[^:]+):(?<Body>.*)$'
         $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)

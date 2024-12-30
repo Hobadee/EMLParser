@@ -8,8 +8,6 @@ function test{
         $imf = [Imf]::new()
         $imf.setRawData($data)
 
-        $imf.unfold()
-
         # $imf.parseHeaders()
 
         # Supidity to return an *ACTUAL* "Imf" object
