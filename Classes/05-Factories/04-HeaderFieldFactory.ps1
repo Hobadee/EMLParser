@@ -4,7 +4,10 @@ class HeaderFieldFactory{
 
         $plugin = [HeaderFieldPlugins]::GetInstance().GetPluginForField($name)
         if ($null -ne $plugin){
-            return $plugin::new($name, $body)
+            $plugin.setName($name)
+            $plugin.setBody($body)
+            $plugin.ParseBody()
+            return $plugin
         }
         # No custom plugin found, use default plugin
         return [HeaderField]::new($name, $body)

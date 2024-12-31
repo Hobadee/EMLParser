@@ -1,4 +1,4 @@
-class PluginHeaderFrom : PluginHeader {
+class PluginHeaderEmail : PluginHeader {
 
     [string]$Name
     [Email]$Email
@@ -12,8 +12,6 @@ class PluginHeaderFrom : PluginHeader {
         .DESCRIPTION
         This plugin will parse the 'From' header field and extract the name and email address.
         #>
-        Write-Debug "Parsing 'From' header field"
-
         $search = '(?:(?<Name>.+)\s+)?<(?<Username>.+)@(?<Domain>.+)>'
         $regex = [regex]::new($search)
 
@@ -34,10 +32,12 @@ class PluginHeaderFrom : PluginHeader {
         #>
         $names = @(
             "From"
+            "X-Original-From"
+            "Reply-To"
         )
         return $names
     }
 
 }
 
-[HeaderFieldPlugins]::GetInstance().RegisterPlugin([PluginHeaderFrom])
+[HeaderFieldPlugins]::GetInstance().RegisterPlugin([PluginHeaderEmail])
