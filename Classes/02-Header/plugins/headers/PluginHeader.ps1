@@ -5,6 +5,20 @@ class PluginHeader: HeaderField{
 
     .DESCRIPTION
     Used by the Header class to hold a single header field
+
+    .NOTES
+    Plugins inherit from HeaderField, so they should get the following properties:
+    - [string]$Name
+    - [string]$Body
+
+    And the following methods:
+    - public [void]__construct([string]$name, [string]$body)
+    - public [void]setName([string]$name)
+    - public [string]getName()
+    - public [void]setBody([string]$body)
+    - public [string]getBody()
+    - public [string]getBodyRaw()
+
     #>
 
     

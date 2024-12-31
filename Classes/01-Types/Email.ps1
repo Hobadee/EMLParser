@@ -14,7 +14,7 @@ class Email {
         Class constructor if you just have the entire email address
         #>
 
-        $search = '(?<username>.+)@(?<domain>.+)>'
+        $search = '^(?<username>.+)@(?<domain>.+)$'
         $regex = [regex]::new($search)
 
         $match = $regex.Matches($email)
@@ -38,7 +38,7 @@ class Email {
         .SYNOPSIS
         Returns the full formatted email address
         #>
-        $str = "$(Username)@$(Domain)"
+        $str = "$($this.Username)@$($this.Domain)"
         return $str
     }
 
@@ -64,4 +64,5 @@ class Email {
     [string]ToString(){
         return $this.getEmail()
     }
+
 }

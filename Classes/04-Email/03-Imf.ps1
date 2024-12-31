@@ -38,7 +38,7 @@ class Imf{
         $this.RawImf = $data
         $this.unfold()
 
-        $this.Headers.parseHeaders($data)
+        $this.Headers.parseHeaders($this.RawImf)
 
         return $this
     }
