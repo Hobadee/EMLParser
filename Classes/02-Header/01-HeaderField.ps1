@@ -133,6 +133,14 @@ class HeaderField{
     #
     [void]ParseBody() {
         # Default behavior for generic headers
+        <#
+        .SYNOPSIS
+        Parse the header as needed
+
+        .DESCRIPTION
+        Default implementation is to throw an exception.  This should be overridden.
+        #>
+        throw [NotImplementedException]::New("Interface must be implemented!")
     }
 
 
