@@ -23,6 +23,17 @@ class PluginHeader: HeaderField{
 
     
     #
+    # Class Constructors
+    #
+    PluginHeader(){
+        # Default constructor - let base initialize
+    }
+    PluginHeader([string]$name, [string]$body) : base($name, $body){
+        # Forward to base constructor so ParseBody() is invoked
+    }
+
+
+    #
     # Plugin functions
     #
     [void]ParseBody() {

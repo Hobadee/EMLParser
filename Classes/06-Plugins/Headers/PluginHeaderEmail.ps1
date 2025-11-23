@@ -3,6 +3,14 @@ class PluginHeaderEmail : PluginHeader {
     [Email]$Email
 
 
+    PluginHeaderEmail() : base(){
+        # Default constructor - let base initialize
+    }
+    PluginHeaderEmail([string]$name, [string]$body) : base($name, $body){
+        # Forward to base constructor so ParseBody() is invoked
+    }
+    
+
     [void]ParseBody() {
         <#
         .SYNOPSIS

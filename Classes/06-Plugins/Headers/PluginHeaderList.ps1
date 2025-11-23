@@ -17,6 +17,14 @@ class PluginHeaderList : PluginHeader {
     [Email]$ListEmail
 
 
+    PluginHeaderList() : base(){
+        # Default constructor - let base initialize
+    }
+    PluginHeaderList([string]$name, [string]$body) : base($name, $body){
+        # Forward to base constructor so ParseBody() is invoked
+    }
+
+
     [void]ParseBody() {
         <#
         .SYNOPSIS

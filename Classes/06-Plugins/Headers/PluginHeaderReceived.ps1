@@ -3,6 +3,15 @@ class PluginHeaderReceived : PluginHeader {
     [string]$Timestamp
     [string]$Server
 
+
+    PluginHeaderReceived() : base(){
+        # Default constructor - let base initialize
+    }
+    PluginHeaderReceived([string]$name, [string]$body) : base($name, $body){
+        # Forward to base constructor so ParseBody() is invoked
+    }
+    
+
     [void]ParseBody() {
         <#
         .SYNOPSIS
