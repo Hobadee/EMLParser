@@ -28,6 +28,7 @@ class Headers : System.Collections.Generic.List[PSObject]{
         return $null
     }
 
+
     [PSObject]getHeadersByName([string]$name){
         <#
             .SYNOPSIS
@@ -40,11 +41,11 @@ class Headers : System.Collections.Generic.List[PSObject]{
             A List of PSObject containing all headers with the specified name
 
             .NOTES
-            This is a convenience overload that does exact matching
+            This is a convenience overload that does anchored matching
         #>
         return $this.getHeadersByName($name, $true)
     }
-    [PSObject]getHeadersByName([string]$name, [bool]$anchorMatch=$true){
+    [PSObject]getHeadersByName([string]$name, [bool]$anchorMatch){
         <#
             .SYNOPSIS
             Returns a List object of all headers matching a name
@@ -54,6 +55,8 @@ class Headers : System.Collections.Generic.List[PSObject]{
 
             .PARAMETER anchorMatch
             If $true, the name will be anchored for "exact" matching (Wildcards still allowed inside)
+            ie: "^$name$"
+            This will default to true via a convenience overload
 
             .OUTPUTS
             A List of PSObject containing all headers with the specified name
