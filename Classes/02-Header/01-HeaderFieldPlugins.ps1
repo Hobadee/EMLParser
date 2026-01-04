@@ -88,11 +88,11 @@ class HeaderFieldPlugins {
         This method returns an instance of the appropriate plugin type for the given header field.
         #>
 
-        Write-Debug("Finding plugin for header: $headerField")
+        # Write-Debug("HeaderFieldPlugins.GetPluginForField() - Finding plugin for header: $headerField")
         if ($this.PluginRegistry.ContainsKey($headerField)) {
-            # Instantiate and return the appropriate plugintes
+            # Instantiate and return the appropriate plugin
             $pluginType = $this.PluginRegistry[$headerField]
-            Write-Debug "HeaderFieldPluigins::GetPluginForField - Found plugin for field '$headerField': $pluginType"
+            # Write-Debug "HeaderFieldPlugins.GetPluginForField() -         Found plugin type: $pluginType"
             return [Activator]::CreateInstance($pluginType)
         }
         return $null  # No matching plugin found

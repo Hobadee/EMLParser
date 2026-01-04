@@ -5,12 +5,12 @@ class HeaderFieldFactory{
         $plugin = [HeaderFieldPlugins]::GetInstance().GetPluginForField($name)
         if ($null -eq $plugin){
             # Requested plugin not found, try generic plugin
-            Write-Debug("Plugin for '$name' not found, using generic plugin")
+            Write-Verbose("HeaderFieldFactory::CreateHeaderField() -  Plugin for '$name' not found, using generic plugin")
             $plugin = [HeaderFieldPlugins]::GetInstance().GetPluginForField("*")
         }
         if ($null -eq $plugin){
             Write-Error("Generic plugin not found.")
-            throw [System.Collections.Generic.KeyNotFoundException]::New("No plugin found for header field '$name' and no generic plugin available.")
+            throw [System.Collections.Generic.KeyNotFoundException]::New("HeaderFieldFactory::CreateHeaderField() -  No plugin found for header field '$name' and no generic plugin available.")
         }
 
         $plugin.setName($name)
