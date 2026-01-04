@@ -79,13 +79,7 @@ class HeaderField{
         .SYNOPSIS
         Set the body of the header field
         #>
-
-        # Trim begining whitespace
-        $search = '^\s+'
-        $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
-        $trimmed = $regex.Replace($body, '')
-
-        $this.Body = $trimmed
+        $this.Body = $body.Trim()
         return $this
     }
     [string]getBody(){
@@ -101,12 +95,11 @@ class HeaderField{
         The body of the header field with excess whitespace removed
         #>
 
+        # Replace multiple whitespace with single space
         $str = $this.Body
         $search = '\s{2,}'
-
         $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
-
-        $str = $regex.Replace($str, '')
+        $str = $regex.Replace($str, ' ')
 
         return $str
     }

@@ -50,14 +50,21 @@ class Headers : System.Collections.Generic.List[PSObject]{
         $search = '^(?<Name>[^:]+):(?<Body>.*)$'
         $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
 
-        $matches = $regex.Matches($rawHeaders)
+        $matches = @($regex.Matches($rawHeaders))
         Write-Debug("Headers found: $($matches.Count)")
 
         foreach ($match in $matches){
             $name = $match.Groups["Name"].Value
             $body = $match.Groups["Body"].Value
-            $hf = [HeaderFieldFactory]::CreateHeaderField($name, $body)
-            $this.Add($hf)
+            try{
+                $hf = [HeaderFieldFactory]::CreateHeaderField($name, $body)
+                $this.Add($hf)
+                Write-Debug("Added header: $($hf.getName())")
+            }
+            catch {
+                Write-Error("Failed to add header field: $_")
+                continue
+            }
         }
 
         return $this

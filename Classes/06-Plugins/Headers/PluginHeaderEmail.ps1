@@ -1,6 +1,6 @@
 class PluginHeaderEmail : PluginHeader {
 
-    [Email]$Email
+    [System.Net.Mail.MailAddress]$Email
 
 
     PluginHeaderEmail() : base(){
@@ -26,7 +26,7 @@ class PluginHeaderEmail : PluginHeader {
 
         $address = $match[0].Groups["Email"].Value
 
-        $this.Email = [Email]::new($address)
+        $this.Email = [System.Net.Mail.MailAddress]::new($address)
     }
 
 
@@ -36,7 +36,13 @@ class PluginHeaderEmail : PluginHeader {
         Return a string of header fields this plugin works for.
         #>
         $names = @(
+            "From"
+            "To"
+            "Cc"
+            "Bcc"
             "Delivered-To"
+            "X-Original-From"
+            "Reply-To"
         )
         return $names
     }

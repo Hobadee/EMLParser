@@ -34,8 +34,8 @@ Describe 'PluginHeader' {
 
 			$ph.getName() | Should -Be 'X-Test'
 			$ph.getBodyRaw() | Should -Be 'abc   def'
-			$ph.getBody() | Should -Be 'abcdef'
-			$ph.ToString() | Should -Be 'X-Test: abcdef'
+			$ph.getBody() | Should -Be 'abc def'
+			$ph.ToString() | Should -Be 'X-Test: abc def'
 		}
 	}
 

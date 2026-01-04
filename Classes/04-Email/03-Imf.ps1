@@ -9,8 +9,10 @@ class Imf{
 
     # Class variables
     # I can't remember - does declaring them here make them global to all instances, or is that Python?!
+    # I checked; No, they are instance variables - NOT static/global
     [string]$RawImf
     [Headers]$Headers
+    [array]$attachments
 
 
     #
@@ -21,9 +23,10 @@ class Imf{
     }
 
 
-    #
-    # Getters/Setters
-    #
+    ###################
+    # Getters/Setters #
+    ###################
+
     [Imf]setRawData([string]$data){
         <#
         .SYNOPSIS
@@ -36,112 +39,121 @@ class Imf{
         #>
 
         $this.RawImf = $data
-        $this.unfold()
 
-        $this.Headers.parseHeaders($this.RawImf)
+        $varHeaders = $this.getHeaderData($true)
+        $this.Headers.parseHeaders($varHeaders)
 
         return $this
     }
+
+
     [string]getRawData(){
+        <#
+        .SYNOPSIS
+        Get raw IMF data
 
-        Write-Debug("Imf.getRawData()")
-
+        .NOTES
+        Returns the raw IMF data as a string.
+        #>
         return $this.RawImf
     }
 
 
     [Imf]setHeaders([Headers]$headers){
+        <#
+        .SYNOPSIS
+        Set the header object for this IMF object
+
+        .PARAMETER headers
+        The Headers object to set
+
+        .OUTPUTS
+        The Imf object with the updated Headers property
+
+        .NOTES
+        This method is used to set the headers for this IMF object.
+
+        If a header object is already set, an exception will be thrown.
+        #>
         if($null -ne $this.Headers){
            throw System.System.AccessViolationException::New('Headers already set - cannot overwrite!')
         }
         $this.Headers = $headers
         return $this
     }
+
+
     [Headers]getHeaders(){
+        <#
+        .SYNOPSIS
+        Get the header object for this IMF object
 
-        #Write-Debug("Imf.getHeaders()")
-
+        .NOTES
+        Returns the Headers object for this IMF object.
+        #>
         return $this.Headers
     }
 
 
-    #
-    # Class Functions
-    #
-    [Imf]unfold(){
+    ###################
+    # Class Functions #
+    ###################
+
+    [string]getHeaderData($unfolded = $true){
         <#
             .SYNOPSIS
-            Function to unfold header fields
+            Extract just the header portion of the message
 
             .DESCRIPTION
-            RFC 5322 - 2.2.3 - https://datatracker.ietf.org/doc/html/rfc5322#section-2.2.3
+            RFC 5322 specifies that headers and body are separated by a blank line (CRLF CRLF).
+            This function returns everything before that blank line.
+
+            .PARAMETER unfolded
+            If $true, will return unfolded header data (default).  If $false, will return raw
+            (probably folded) header data.
 
             .NOTES
-            We should probably trim all extra whitespace to a single space character as well
+            Returns the raw header data, including the blank line separator
         #>
 
-        Write-Debug("Imf.unfold()")
+        # Match everything up to and including the first blank line (CRLF CRLF)
 
-        # Unfold by "s/\r\n\s+/ /"
-        # https://stackoverflow.com/questions/53867147/grep-and-sed-equivalent-in-powershell
-        # ^ ??
+        $search = '(?s)^(.*?)\r\n\r\n'
+        $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
+        $match = $regex.Match($this.RawImf)
 
-        # Folded data is CRLF+whitespace
-        $search = '\r\n\s+'
-        # We need to replace with a single space so we don't concatenate the data
-        $replace = ' '
 
-        $this.RawImf = $this.RawImf -replace $search, $replace
+        if ($match.Success) {
+            Write-Debug("Imf.GetHeaderData() - Found Header Data: $($match.Groups[1].Value.Length) characters")
+            # `$varHeaders` to prevent namespace collision with class variable
+            $varHeaders = $match.Groups[1].Value
+        }
+        else {
+            Write-Debug("No header data found in IMF message.")
+            throw [System.Exception]::New("No header data found in IMF message.")
+        }
 
-        return $this
+        if ($unfolded) {
+            
+            # Per RFC, folded data is CRLF+whitespace
+            # Unfold by "s/\r\n\s+/ /"
+            $search = '\r\n\s+'
+            $regex = [regex]::new($search)
+            $matches1 = $regex.Matches($varHeaders)
+            Write-Debug("Imf.GetHeaderData() - Unfolding: Found $($matches1.Count) folding patterns")
+            # We need to replace with a single space so we don't concatenate the data
+            $varHeaders = $regex.Replace($varHeaders, ' ')
+
+            # Trim extra whitespace
+            $search = ' {2,}'
+            $regex = [regex]::new($search)
+            $matches2 = $regex.Matches($varHeaders)
+            Write-Debug("Imf.GetHeaderData() - Trimming: Found $($matches2.Count) extra whitespace patterns")
+            $varHeaders = $regex.Replace($varHeaders, ' ')
+        }
+
+        return $varHeaders
     }
-
-
-    [Imf]fold([string]$imf){
-        <#
-            .SYNOPSIS
-            Function to fold header fields
-
-            .DESCRIPTION
-            RFC 5322 - 2.2.3 - https://datatracker.ietf.org/doc/html/rfc5322#section-2.2.3
-
-            Does fancy magic to ensure nothing over 80 characters per line.  Except when there should be.
-        #>
-
-        Write-Debug("Imf.fold()")
-
-        # This isn't terribly important for our purposes right now.  Implement later, if ever.
-        throw System.NotImplementedException::New('"Fold" Method not implemented')
-
-        return $this
-
-    }
-
-
-    # [Imf]parseHeaders(){
-    #     <#
-    #     .SYNOPSIS
-    #     Parse $self._RawImf for headers
-    #     #>
-
-    #     Write-Debug("Imf.parseHeaders()")
-
-    #     $search = '^(?<Name>[^:]+):(?<Body>.*)$'
-    #     $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::Multiline)
-
-    #     $matches = $regex.Matches($this.RawImf)
-    #     Write-Debug("Headers found: $($matches.Count)")
-
-    #     foreach ($match in $matches){
-    #         $name = $match.Groups["Name"].Value
-    #         $body = $match.Groups["Body"].Value
-    #         $hf = [HeaderField]::new()
-    #         $hf.setName($name).setBody($body)
-    #         $this.getHeaders().Add($hf)
-    #     }
-
-    #     return $this
-    # }
 
 
     [PSObject]getPath(){
@@ -162,5 +174,74 @@ class Imf{
         return $path
 
     }
+
+    [string]getBodyData(){
+        <#
+            .SYNOPSIS
+            Extract just the body portion of the message
+
+            .DESCRIPTION
+            RFC 5322 specifies that headers and body are separated by a blank line (CRLF CRLF).
+            This function returns everything after that blank line.
+
+            .NOTES
+            Returns the raw message body; preserves original line endings and formatting
+        #>
+
+        # Match everything after the first blank line (CRLF CRLF)
+        $search = '(?s)^\r\n\r\n(.*)$'
+        $regex = [regex]::new($search)
+        $match = $regex.Match($this.RawImf)
+
+        if ($match.Success) {
+            Write-Debug("Found body data: $($match.Groups[1].Value.Length) characters")
+            return $match.Groups[1].Value
+        }
+
+        Write-Debug("No blank line separator found; body data is empty")
+        return ""
+    }
+
+    # TODO: Not compiling currently - fix later
+    # [array]getAttachmentData(){
+    #     <#
+    #         .SYNOPSIS
+    #         Extract attachment data from the message body
+
+    #         .DESCRIPTION
+    #         Parses MIME multipart messages to identify and extract attachments.
+    #         Attachments are identified by Content-Disposition: attachment headers.
+
+    #         .NOTES
+    #         Currently returns an array of attachment objects for later refactoring.
+    #         Stores results in $this.attachments
+    #     #>
+
+    #     Write-Debug("Imf.getAttachmentData()")
+
+    #     $this.attachments = @()
+    #     $body = $this.getBodyData()
+
+    #     # Look for Content-Disposition: attachment headers in the body
+    #     $search = 'Content-Disposition:\s*attachment[^`n]*filename[^=]*=\s*["\']?([^"\'`r`n]+)["\']?'
+    #     $regex = [regex]::new($search, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+    #     $matches = @($regex.Matches($body))
+
+    #     Write-Debug("Found $($matches.Count) attachments")
+
+    #     foreach ($match in $matches) {
+    #         $filename = $match.Groups[1].Value
+    #         Write-Debug("Found attachment: $filename")
+            
+    #         $attachmentObj = [PSCustomObject]@{
+    #             Filename = $filename
+    #             # Additional properties can be added here during refactoring
+    #         }
+
+    #         $this.attachments += $attachmentObj
+    #     }
+
+    #     return $this.attachments
+    # }
 
 }

@@ -1,5 +1,18 @@
 # EML Parser Module
-This PowerShell module will parse an EML file (raw storage of an RFC5322 message) and allow operations on it.
+This PowerShell module will parse an EML file (raw storage of an [RFC5322](https://www.rfc-editor.org/rfc/rfc5322.html) message) and allow operations on it.
+
+# Building
+This project requires PoshCode ModuleBuilder to build.  (https://github.com/PoshCode/ModuleBuilder)
+
+Install ModuleBuilder with:
+`Install-Module ModuleBuilder -AllowPrerelease`
+
+To build, simply run `Build-Module` in the project root.  On *NIX environments with `make`, you may run `make`.
+
+
+# Testing
+This project has Pester tests that can be run.  From the root of this project, simply run: `Invoke-Pester`
+On *NIX environments with `make` installed, you may run `make test`
 
 # TODO
 ## Plugin system for headers

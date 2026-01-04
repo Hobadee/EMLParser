@@ -35,10 +35,10 @@ Describe 'PluginHeaderEmail' {
 
             $ph.ParseBody()
 
-            $ph.Email | Should -BeOfType ([Email])
-            $ph.Email.getEmail() | Should -Be 'alice@example.com'
-            $ph.Email.getUsername() | Should -Be 'alice'
-            $ph.Email.getDomain() | Should -Be 'example.com'
+            $ph.Email | Should -BeOfType ([System.Net.Mail.MailAddress])
+            $ph.Email.Address | Should -Be 'alice@example.com'
+            $ph.Email.User | Should -Be 'alice'
+            $ph.Email.Host | Should -Be 'example.com'
         }
 
         # It 'Constructor that passes name/body triggers ParseBody' {
@@ -46,6 +46,58 @@ Describe 'PluginHeaderEmail' {
         #     $ph2.Email | Should -BeOfType ([Email])
         #     $ph2.Email.getEmail() | Should -Be 'bob@domain.com'
         # }
+    }
+
+    Context 'Parsing multiple email addresses' {
+        It 'ParseBody extracts multiple comma-separated email addresses' {
+            $ph = [PluginHeaderEmail]::new()
+            $null = $ph.setBody('alice@example.com, bob@domain.com')
+
+            $ph.ParseBody()
+
+            $ph.Emails | Should -HaveCount 2
+            $ph.Emails[0].Address | Should -Be 'alice@example.com'
+            $ph.Emails[1].Address | Should -Be 'bob@domain.com'
+        }
+
+        It 'ParseBody extracts multiple addresses with display names' {
+            $ph = [PluginHeaderEmail]::new()
+            $null = $ph.setBody('Alice Smith <alice@example.com>, Bob Johnson <bob@domain.com>')
+
+            $ph.ParseBody()
+
+            $ph.Emails | Should -HaveCount 2
+            $ph.Emails[0].Address | Should -Be 'alice@example.com'
+            $ph.Emails[0].DisplayName | Should -Be 'Alice Smith'
+            $ph.Emails[1].Address | Should -Be 'bob@domain.com'
+            $ph.Emails[1].DisplayName | Should -Be 'Bob Johnson'
+        }
+
+        It 'ParseBody handles mixed email addresses with and without display names' {
+            $ph = [PluginHeaderEmail]::new()
+            $null = $ph.setBody('Alice Smith <alice@example.com>, bob@domain.com, "Charlie Brown" <charlie@test.org>')
+
+            $ph.ParseBody()
+
+            $ph.Emails | Should -HaveCount 3
+            $ph.Emails[0].Address | Should -Be 'alice@example.com'
+            $ph.Emails[0].DisplayName | Should -Be 'Alice Smith'
+            $ph.Emails[1].Address | Should -Be 'bob@domain.com'
+            $ph.Emails[2].Address | Should -Be 'charlie@test.org'
+            $ph.Emails[2].DisplayName | Should -Be 'Charlie Brown'
+        }
+
+        It 'ParseBody trims whitespace around comma-separated addresses' {
+            $ph = [PluginHeaderEmail]::new()
+            $null = $ph.setBody('alice@example.com  ,  bob@domain.com  ,  charlie@test.org')
+
+            $ph.ParseBody()
+
+            $ph.Emails | Should -HaveCount 3
+            $ph.Emails[0].Address | Should -Be 'alice@example.com'
+            $ph.Emails[1].Address | Should -Be 'bob@domain.com'
+            $ph.Emails[2].Address | Should -Be 'charlie@test.org'
+        }
     }
 
     Context 'Plugin registration and metadata' {

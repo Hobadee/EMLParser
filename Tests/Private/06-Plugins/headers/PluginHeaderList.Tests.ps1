@@ -29,8 +29,8 @@ Describe 'PluginHeaderList' {
             $ph.ParseBody()
 
             $ph.ListType | Should -Be 'Post'
-            $ph.ListEmail | Should -BeOfType ([Email])
-            $ph.ListEmail.getEmail() | Should -Be 'mailto:groupname@example.com'
+            $ph.ListEmail | Should -BeOfType ([System.Net.Mail.MailAddress])
+            $ph.ListEmail.Address | Should -Be 'groupname@example.com'
             $ph.ListUrl | Should -Be 'https://groups.google.com/a/example.com/group/groupname/'
         }
 
@@ -49,8 +49,8 @@ Describe 'PluginHeaderList' {
         It 'constructor that passes name/body triggers ParseBody' {
             $ph2 = [PluginHeaderList]::new('List-Archive','List-Archive: <mailto:archive@example.com>')
             $ph2.ListType | Should -Be 'Archive'
-            $ph2.ListEmail | Should -BeOfType ([Email])
-            $ph2.ListEmail.getEmail() | Should -Be 'mailto:archive@example.com'
+            $ph2.ListEmail | Should -BeOfType ([System.Net.Mail.MailAddress])
+            $ph2.ListEmail.Address | Should -Be 'archive@example.com'
         }
     }
 

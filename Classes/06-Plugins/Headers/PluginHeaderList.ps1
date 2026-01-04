@@ -14,7 +14,7 @@ class PluginHeaderList : PluginHeader {
 
     [string]$ListType
     [string]$ListUrl
-    [Email]$ListEmail
+    [System.Net.Mail.MailAddress]$ListEmail
 
 
     PluginHeaderList() : base(){
@@ -52,7 +52,8 @@ class PluginHeaderList : PluginHeader {
                 }
                 '^mailto\:.*' {
                     # $_ is mailto
-                    $this.ListEmail = [Email]::new($_)
+                    # Substring(7) to remove `mailto:`
+                    $this.ListEmail = [System.Net.Mail.MailAddress]::new($_.Substring(7))
                 }
                 Default {}
             }
@@ -65,7 +66,8 @@ class PluginHeaderList : PluginHeader {
                 }
                 '^mailto\:.*' {
                     # $_ is mailto
-                    $this.ListEmail = [Email]::new($_)
+                    # Substring(7) to remove `mailto:`
+                    $this.ListEmail = [System.Net.Mail.MailAddress]::new($_.Substring(7))
                 }
                 Default {}
             }
