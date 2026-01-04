@@ -2,6 +2,7 @@
 
 ## Project Overview
 This is a PowerShell module that parses **EML files** (raw RFC 5322 Internet Message Format messages) and provides operations on email data. The module allows developers to read, analyze, and manipulate email message content programmatically.
+Other than building and testing, this project should be entirely self-contained and not depend on any external libraries beyond standard PowerShell capabilities.
 
 - **Language**: PowerShell 7.4+
 - **Compatibility**: PowerShell Core and Desktop editions
