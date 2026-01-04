@@ -89,6 +89,7 @@ class PluginHeaderList : PluginHeader {
             "List-Help"
             "List-Archive"
             "List-Unsubscribe"
+            "List-Unsubscribe-Post"
         )
         return $names
     }
