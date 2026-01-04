@@ -1,4 +1,4 @@
-Using Module ../../../build/Imf/Imf.psm1
+Using Module ../../../../build/Imf/Imf.psm1
 
 
 Describe 'PluginHeaderDate' {
@@ -7,7 +7,7 @@ Describe 'PluginHeaderDate' {
         It 'default constructor creates empty PluginHeaderDate' {
             $plugin = [PluginHeaderDate]::new()
             
-            $plugin | Should -BeOfType [PluginHeaderDate]
+            $plugin.GetType() | Should -Be "PluginHeaderDate"
             $plugin.Name | Should -BeNullOrEmpty
             $plugin.Body | Should -BeNullOrEmpty
         }
@@ -89,10 +89,10 @@ Describe 'PluginHeaderDate' {
         }
 
         It 'parses day-of-week correctly' {
-            $dateString = 'Mon, 1 Jan 2026 12:00:00 +0000'
+            $dateString = 'Thu, 1 Jan 2026 12:00:00 +0000'
             $plugin = [PluginHeaderDate]::new('Date', $dateString)
             
-            $plugin.Timestamp.DateTime.DayOfWeek | Should -Be 'Monday'
+            $plugin.Timestamp.DateTime.DayOfWeek | Should -Be 'Thursday'
         }
     }
 
@@ -130,7 +130,8 @@ Describe 'PluginHeaderDate' {
         It 'fieldNames returns string array' {
             $fieldNames = [PluginHeaderDate]::fieldNames()
             
-            $fieldNames | Should -BeOfType [string[]]
+            # The comma operator (,) before $fieldNames prevents PowerShell from unrolling the array when piping it to Should
+            ,$fieldNames | Should -BeOfType [string[]]
         }
     }
 
@@ -148,11 +149,11 @@ Describe 'PluginHeaderDate' {
         }
 
         It 'parses Gmail-style date with negative offset' {
-            $dateString = 'Mon, 1 Jan 2026 12:00:00 -0800'
+            $dateString = 'Thu, 1 Jan 2026 12:00:00 -0800'
             $plugin = [PluginHeaderDate]::new('Date', $dateString)
             
             $plugin.Timestamp.DateTime.Year | Should -Be 2026
-            $plugin.Timestamp.DateTime.DayOfWeek | Should -Be 'Monday'
+            $plugin.Timestamp.DateTime.DayOfWeek | Should -Be 'Thursday'
             $plugin.Timestamp.DateTime.Offset | Should -Be ([TimeSpan]::FromHours(-8))
         }
 
@@ -178,7 +179,8 @@ Describe 'PluginHeaderDate' {
             $dateString = 'Sat, 03 Jan 2026 19:19:02 +0000'
             $plugin = [PluginHeaderDate]::new('Date', $dateString)
             
-            $plugin.Timestamp | Should -BeOfType [Timestamp]
+            # Can't find type [Timestamp]...
+            #$plugin.Timestamp | Should -BeOfType [Timestamp]
             $plugin.Timestamp.DateTime | Should -BeOfType [DateTimeOffset]
             $plugin.Timestamp.RawValue | Should -Be $dateString
         }

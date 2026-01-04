@@ -72,7 +72,7 @@ class PluginHeaderDate : PluginHeader {
         Array of header field names (strings)
         #>
         return @(
-            "Date",
+            "Date"
             "X-Date"
         )
     }
