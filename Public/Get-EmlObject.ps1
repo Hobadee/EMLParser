@@ -13,7 +13,8 @@ function Get-EmlObject {
     The file path to the EML file.
 
     .EXAMPLE
-    Get-EmlInfo -Path "C:\emails\message.eml"
+    $eml = Get-EmlObject -Path "C:\emails\message.eml"
+    $eml.Imf.Headers
     #>
     [CmdletBinding()]
     param(

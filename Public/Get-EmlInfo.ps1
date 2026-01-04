@@ -22,11 +22,19 @@ function Get-EmlInfo {
     process {
         try {
             $imf = [ImfFactory]::CreateImfFromFile($Path)
+
+            # Get the domain from the From header
+            $fromHeader = $imf.Headers.getHeaderByName('From')
+            $domain = $fromHeader.Emails[0].Host
+
+            # Query DMARC TXT record
+            $dmarc = [System.Net.Dns]::GetHostByName("_dmarc.$domain")
             
             [PSCustomObject]@{
                 From           = $imf.Headers.getHeaderByName('From')
                 To             = $imf.Headers.getHeaderByName('To')
                 Cc             = $imf.Headers.getHeaderByName('Cc')
+                DMARC          = $dmarc
                 Subject        = $imf.Headers.getHeaderByName('Subject').getBody()
                 Date           = $imf.Headers.getHeaderByName('Date').getBody()
                 MessageID      = $imf.Headers.getHeaderByName('Message-ID').getBody()

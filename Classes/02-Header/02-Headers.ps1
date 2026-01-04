@@ -12,6 +12,12 @@ class Headers : System.Collections.Generic.List[PSObject]{
         <#
             .SYNOPSIS
             Returns the *FIRST* header matching $name
+
+            .PARAMETER name
+            The header field name to search for
+
+            .OUTPUTS
+            A PSObject containing the first header with the specified name, or $null if not found
         #>
 
         foreach($header in $this){
@@ -22,17 +28,45 @@ class Headers : System.Collections.Generic.List[PSObject]{
         return $null
     }
 
-
     [PSObject]getHeadersByName([string]$name){
         <#
             .SYNOPSIS
             Returns a List object of all headers matching a name
+
+            .PARAMETER name
+            The header field name to filter by
+
+            .OUTPUTS
+            A List of PSObject containing all headers with the specified name
+
+            .NOTES
+            This is a convenience overload that does exact matching
+        #>
+        return $this.getHeadersByName($name, $true)
+    }
+    [PSObject]getHeadersByName([string]$name, [bool]$anchorMatch=$true){
+        <#
+            .SYNOPSIS
+            Returns a List object of all headers matching a name
+
+            .PARAMETER name
+            The header field name to filter by
+
+            .PARAMETER anchorMatch
+            If $true, the name will be anchored for "exact" matching (Wildcards still allowed inside)
+
+            .OUTPUTS
+            A List of PSObject containing all headers with the specified name
         #>
 
         $rtnArray = [System.Collections.Generic.List[PSObject]]::new()
 
+        if($anchorMatch){
+            $name = "^$name$"
+        }
+
         foreach($header in $this){
-            if($header.getName() -eq $name){
+            if($header.getName() -Match $name){
                 $rtnArray.Add($header)
             }
         }

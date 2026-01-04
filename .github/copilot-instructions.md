@@ -3,6 +3,7 @@
 ## Project Overview
 This is a PowerShell module that parses **EML files** (raw RFC 5322 Internet Message Format messages) and provides operations on email data. The module allows developers to read, analyze, and manipulate email message content programmatically.
 Other than building and testing, this project should be entirely self-contained and not depend on any external libraries beyond standard PowerShell capabilities.
+This project should be fully cross-platform compatible with Windows, Mac, and Linux systems running PowerShell 7.4 or later.
 
 - **Language**: PowerShell 7.4+
 - **Compatibility**: PowerShell Core and Desktop editions
@@ -80,7 +81,7 @@ The module implements RFC 5322 (Internet Message Format). Refer to parsing logic
 Build-Module  # Run in project root
 ```
 
-Or with `make`:
+Or on *NIX with `make`:
 ```bash
 make
 ```
@@ -91,7 +92,7 @@ make
 Invoke-Pester
 ```
 
-Or with `make`:
+Or on *NIX with `make`:
 ```bash
 make test
 ```
