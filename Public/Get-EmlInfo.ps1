@@ -24,7 +24,14 @@ function Get-EmlInfo {
             $imf = [ImfFactory]::CreateImfFromFile($Path)
             
             [PSCustomObject]@{
-                Imf    = $imf
+                From           = $imf.Headers.getHeaderByName('From')
+                To             = $imf.Headers.getHeaderByName('To')
+                Cc             = $imf.Headers.getHeaderByName('Cc')
+                Subject        = $imf.Headers.getHeaderByName('Subject').getBody()
+                Date           = $imf.Headers.getHeaderByName('Date').getBody()
+                MessageID      = $imf.Headers.getHeaderByName('Message-ID').getBody()
+                MessageHops    = ($imf.Headers.getHeadersByName('Received')).Count
+                BodySize       = $imf.Body.Length
             }
         }
         catch {

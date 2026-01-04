@@ -128,7 +128,8 @@ Test files follow the pattern:
 1. Create plugin class in `Classes/06-Plugins/Headers/PluginHeader[Type].ps1`
 2. Extend `PluginHeader` base class
 3. Implement header-specific parsing logic
-4. Register plugin in factory
+4. Register plugin in factory by calling `[HeaderFieldPlugins]::GetInstance().RegisterPlugin([PluginHeader[Type]])`
+
 
 ### Adding a New Class
 1. Create file in appropriate numbered folder under `Classes/`

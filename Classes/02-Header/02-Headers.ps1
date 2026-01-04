@@ -41,10 +41,49 @@ class Headers : System.Collections.Generic.List[PSObject]{
     }
 
 
+    [PSObject]getHeadersByPlugin([string]$pluginName){
+        <#
+            .SYNOPSIS
+            Returns a List object of all headers matching a plugin type
+
+            .PARAMETER pluginName
+            The plugin type name to filter headers by
+
+            .OUTPUTS
+            A List of PSObject containing all headers of the specified plugin type
+        #>
+
+        $rtnArray = [System.Collections.Generic.List[PSObject]]::new()
+
+        foreach($header in $this){
+            if($header.GetType().Name -eq $pluginName){
+                $rtnArray.Add($header)
+            }
+        }
+        
+        return $rtnArray
+    }
+
+
     [Headers]parseHeaders([string]$rawHeaders){
         <#
         .SYNOPSIS
-        Parse for headers
+        Parse raw header data into HeaderField objects
+
+        .DESCRIPTION
+        This method parses the provided raw header string into individual
+        HeaderField objects (or PluginHeaderField objects as appropriate) and
+        adds them to the Headers collection.
+
+        .PARAMETER rawHeaders
+        The raw header string to parse
+
+        .OUTPUTS
+        The Headers object with parsed HeaderField objects added
+
+        .NOTES
+        This method uses a regex to identify header lines and then
+        utilizes the HeaderFieldFactory to create appropriate header objects.
         #>
 
         $search = '^(?<Name>[^:]+):(?<Body>.*)$'
