@@ -94,6 +94,25 @@ class Imf{
         return $this.Headers
     }
 
+    
+    #########################
+    # Passthrough Functions #
+    #########################
+
+
+    [PluginHeader]getHeaderByName([string]$name){
+        return $this.Headers.getHeaderByName($name)
+    }
+    [PSObject]getHeadersByName([string]$name){
+        return $this.Headers.getHeadersByName($name, $true)
+    }
+    [PSObject]getHeadersByName([string]$name, [bool]$anchorMatch){
+        return $this.Headers.getHeadersByName($name, $anchorMatch)
+    }
+    [PSObject]getHeadersByPlugin([string]$pluginName){
+        return $this.Headers.getHeadersByPlugin($pluginName)
+    }
+
 
     ###################
     # Class Functions #
@@ -167,9 +186,12 @@ class Imf{
                 Do we need to include X-Recieved?
         #>
 
-        Write-Debug("Imf.getPath()")
-
+        # Received headers must ALWAYS be in reverse-chronological order per RFC5321
+        # (Newer Received headers are required to be prepended to the top of the header block)
+        # Because of this, we can just return them in the order we find them
         $path = $this.getHeaders().getHeadersByName("(X-)?Received")
+
+        $path = $path | Sort-Object -Property HeaderIndex -Descending
         
         return $path
 

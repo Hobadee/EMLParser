@@ -95,6 +95,16 @@ Describe 'PluginHeaderEmail' {
             $ph.Emails[1].Address | Should -Be 'bob@domain.com'
             $ph.Emails[2].Address | Should -Be 'charlie@test.org'
         }
+
+        It 'ParseBody handles no display names' {
+            $ph = [PluginHeaderEmail]::new()
+            $null = $ph.setBody('<bounces@example.com>')
+
+            $ph.ParseBody()
+
+            $ph.Emails | Should -HaveCount 1
+            $ph.Emails[0].Address | Should -Be 'bounces@example.com'
+        }
     }
 
     Context 'Plugin registration and metadata' {

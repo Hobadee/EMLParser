@@ -123,6 +123,7 @@ class PluginHeaderEmail : PluginHeader {
             "Delivered-To"
             "X-Original-From"
             "Reply-To"
+            "Return-Path"
         )
         return $names
     }

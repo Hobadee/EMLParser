@@ -1,6 +1,6 @@
 class HeaderFieldFactory{
 
-    static [HeaderField]CreateHeaderField([string]$name, [string]$body){
+    static [HeaderField]CreateHeaderField([string]$name, [string]$body, [int]$index){
 
         $plugin = [HeaderFieldPlugins]::GetInstance().GetPluginForField($name)
         if ($null -eq $plugin){
@@ -16,6 +16,7 @@ class HeaderFieldFactory{
         $plugin.setName($name)
         $plugin.setBody($body)
         $plugin.ParseBody()
+        $plugin.setHeaderIndex($index)
         return $plugin
     }
 }

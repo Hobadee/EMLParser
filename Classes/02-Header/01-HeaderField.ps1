@@ -14,6 +14,7 @@ class HeaderField{
     # Class variables
     [string]$Name
     [string]$Body
+    [int]$HeaderIndex   # Track the index of this header in the original message (0-based)
 
 
     #
@@ -42,6 +43,27 @@ class HeaderField{
         $this.Body = $body
         
         $this.ParseBody()
+    }
+    HeaderField([string]$name, [string]$body, [int]$index){
+        <#
+        .SYNOPSIS
+        Class constructor for the HeaderField class
+
+        .PARAMETER name
+        The name of the header field
+
+        .PARAMETER body
+        The body of the header field
+
+        .PARAMETER index
+        The index of the header field in the original message
+
+        .NOTES
+        This constructor sets the header index in addition to name and body
+        #>
+        $this.HeaderIndex = $index
+
+        $this.HeaderField($name, $body)
     }
 
 
@@ -118,6 +140,31 @@ class HeaderField{
         #>
 
         return $this.Body
+    }
+
+
+    [HeaderField]setHeaderIndex([int]$index){
+        <#
+        .SYNOPSIS
+        Set the index of the header field in the original message
+
+        .PARAMETER index
+        The index of the header field
+        .OUTPUTS
+        The current object
+        #>
+        $this.HeaderIndex = $index
+        return $this
+    }
+    [int]getHeaderIndex(){
+        <#
+        .SYNOPSIS
+        Get the index of the header field in the original message
+
+        .OUTPUTS
+        The index of the header field
+        #>
+        return $this.HeaderIndex
     }
 
 

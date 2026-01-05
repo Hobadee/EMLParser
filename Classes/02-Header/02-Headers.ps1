@@ -129,11 +129,14 @@ class Headers : System.Collections.Generic.List[PSObject]{
         $matches = @($regex.Matches($rawHeaders))
         Write-Debug("Headers.parseHeaders() - Headers found: $($matches.Count)")
 
+        # 0-index, except we ++ at the start of the loop to avoid `continue` skipping the increment
+        $i = -1
         foreach ($match in $matches){
+            $i++
             $name = $match.Groups["Name"].Value
             $body = $match.Groups["Body"].Value
             try{
-                $hf = [HeaderFieldFactory]::CreateHeaderField($name, $body)
+                $hf = [HeaderFieldFactory]::CreateHeaderField($name, $body, $i)
                 $this.Add($hf)
                 Write-Debug("Headers.parseHeaders() - Adding plugin '$($hf.GetType())' for header '$($hf.getName())'")
             }
