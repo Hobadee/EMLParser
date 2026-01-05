@@ -74,9 +74,31 @@ Describe 'Timestamp' {
             $ts.DateTime.Offset | Should -Be ([TimeSpan]::Zero)
         }
 
+        It 'parses GMT timezone' {
+            $ts = [Timestamp]::new('Sat, 03 Jan 2026 19:19:02 GMT')
+            $ts.DateTime.Year | Should -Be 2026
+            $ts.DateTime.Month | Should -Be 1
+            $ts.DateTime.Day | Should -Be 3
+            $ts.DateTime.Hour | Should -Be 19
+            $ts.DateTime.Minute | Should -Be 19
+            $ts.DateTime.Second | Should -Be 2
+            $ts.DateTime.Offset | Should -Be ([TimeSpan]::Zero)
+        }
+
         It 'parses half-hour timezone offset (+0530)' {
             $ts = [Timestamp]::new('03 Jan 2026 19:19:02 +0530')
             $ts.DateTime.Offset | Should -Be ([TimeSpan]::FromMinutes(330))
+        }
+
+        It 'parses timestamp with human-readable timezone abbreviation' {
+            $ts = [Timestamp]::new('Sat, 3 Jan 2026 11:19:03 -0800 (PST)')
+            $ts.DateTime.Year | Should -Be 2026
+            $ts.DateTime.Month | Should -Be 1
+            $ts.DateTime.Day | Should -Be 3
+            $ts.DateTime.Hour | Should -Be 11
+            $ts.DateTime.Minute | Should -Be 19
+            $ts.DateTime.Second | Should -Be 3
+            $ts.DateTime.Offset | Should -Be ([TimeSpan]::FromHours(-8))
         }
 
         It 'parses time with seconds at 00' {

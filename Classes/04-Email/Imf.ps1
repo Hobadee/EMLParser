@@ -169,7 +169,7 @@ class Imf{
 
         Write-Debug("Imf.getPath()")
 
-        $path = $this.getHeaders().getHeadersByName("Received")
+        $path = $this.getHeaders().getHeadersByName("(X-)?Received")
         
         return $path
 

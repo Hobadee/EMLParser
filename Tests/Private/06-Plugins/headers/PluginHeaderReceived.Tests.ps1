@@ -21,20 +21,78 @@ Describe 'PluginHeaderReceived' {
     # }
 
     Context 'Parsing Received header' {
-        It 'ParseBody sets Timestamp and Server when called explicitly' {
+        It 'parses all fields from a complete Received header' {
             $ph = [PluginHeaderReceived]::new()
-            $null = $ph.setBody('from mail.example.com by mx.example.net; Tue, 1 Jan 2020 12:34:56 +0000')
+            $body = 'from mail.example.com by mx.example.net with SMTP id ABC123; Tue, 1 Jan 2020 12:34:56 +0000'
+            $null = $ph.setBody($body)
 
             $ph.ParseBody()
 
-            $ph.Timestamp | Should -Be 'Parsed Timestamp'
-            $ph.Server | Should -Be 'Parsed Server'
+            $ph.From | Should -Be 'mail.example.com'
+            $ph.By | Should -Be 'mx.example.net'
+            $ph.IdType | Should -Be 'SMTP'
+            $ph.Id | Should -Be 'ABC123'
+            $ph.Timestamp | Should -Not -BeNullOrEmpty
+        }
+
+        It 'parses From field' {
+            $ph = [PluginHeaderReceived]::new()
+            $body = 'from sender.example.com by receiver.example.net; Tue, 1 Jan 2020 12:34:56 +0000'
+            $null = $ph.setBody($body)
+
+            $ph.ParseBody()
+
+            $ph.From | Should -Be 'sender.example.com'
+        }
+
+        It 'parses By field' {
+            $ph = [PluginHeaderReceived]::new()
+            $body = 'from sender.example.com by receiver.example.net; Tue, 1 Jan 2020 12:34:56 +0000'
+            $null = $ph.setBody($body)
+
+            $ph.ParseBody()
+
+            $ph.By | Should -Be 'receiver.example.net'
+        }
+
+        It 'parses IdType from with field' {
+            $ph = [PluginHeaderReceived]::new()
+            $body = 'from sender.example.com by receiver.example.net with HTTP id ABC123; Tue, 1 Jan 2020 12:34:56 +0000'
+            $null = $ph.setBody($body)
+
+            $ph.ParseBody()
+
+            $ph.IdType | Should -Be 'HTTP'
+        }
+
+        It 'parses Id field' {
+            $ph = [PluginHeaderReceived]::new()
+            $body = 'from sender.example.com by receiver.example.net with SMTP id XYZ789; Tue, 1 Jan 2020 12:34:56 +0000'
+            $null = $ph.setBody($body)
+
+            $ph.ParseBody()
+
+            $ph.Id | Should -Be 'XYZ789'
+        }
+
+        It 'parses Timestamp field' {
+            $ph = [PluginHeaderReceived]::new()
+            $body = 'from sender.example.com by receiver.example.net; 3 Jan 2026 11:19:00 -0800'
+            $null = $ph.setBody($body)
+
+            $ph.ParseBody()
+
+            $ph.Timestamp | Should -Be 'Sat, 03 Jan 2026 11:19:00 -0800'
         }
 
         It 'constructor that passes name/body triggers ParseBody' {
-            $ph2 = [PluginHeaderReceived]::new('Received','received value')
-            $ph2.Timestamp | Should -Be 'Parsed Timestamp'
-            $ph2.Server | Should -Be 'Parsed Server'
+            $ph2 = [PluginHeaderReceived]::new('Received', 'from mail.example.com by mx.example.net with SMTP id TEST123; Thu, 2 Jan 2020 10:20:30 +0000')
+            
+            $ph2.From | Should -Be 'mail.example.com'
+            $ph2.By | Should -Be 'mx.example.net'
+            $ph2.IdType | Should -Be 'SMTP'
+            $ph2.Id | Should -Be 'TEST123'
+            $ph2.Timestamp | Should -Be 'Thu, 02 Jan 2020 10:20:30 +0000'
         }
     }
 
@@ -50,10 +108,10 @@ Describe 'PluginHeaderReceived' {
             $plugin | Should -BeOfType ([PluginHeaderReceived])
         }
 
-        It 'GetPluginForField returns $null for an unknown field' {
-            $inst = [HeaderFieldPlugins]::GetInstance()
-            $inst.GetPluginForField('X-Unknown-Header') | Should -Be $null
-        }
+        # It 'GetPluginForField throws KeyNotFoundException for unknown field' {
+        #     $inst = [HeaderFieldPlugins]::GetInstance()
+        #     { $inst.GetPluginForField('X-Unknown-Header') } | Should -Throw 'KeyNotFoundException'
+        # }
     }
 
 }

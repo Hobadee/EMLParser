@@ -69,6 +69,12 @@ class Timestamp {
         # Normalize day to zero-padded format (e.g., "3" -> "03")
         # This handles RFC 5322 which allows both "3 Jan" and "03 Jan"
         $cleanedDate = $cleanedDate -replace '^(\d)\s', '0$1 '
+
+        # Remove a "GMT" timezone with no offset
+        $cleanedDate = $cleanedDate -replace '\sGMT$', ' +0000'
+
+        # Remove any human-readable timezone names (e.g., "PST", "EST") if present
+        $cleanedDate = $cleanedDate -replace '\s\(?[A-Z]{2,4}\)?$', ''
         
         # RFC 5322 date format: dd MMM yyyy HH:mm:ss zzz
         $format = 'dd MMM yyyy HH:mm:ss zzz'
